@@ -14,8 +14,25 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+
+    // Scalar UI configuration 
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTheme(ScalarTheme.BluePlanet)
+            .WithLayout(ScalarLayout.Modern)
+            .WithTitle("v1");
+
+        options.ShowSidebar = true;
+        options.HideDarkModeToggle = false;
+        options.ShowOperationId = false;
+        options.DefaultOpenAllTags = false;
+        options.ExpandAllResponses = false;
+        options.ExpandAllModelSections = false;
+    });
+
 }
+
 
 app.UseHttpsRedirection();
 
