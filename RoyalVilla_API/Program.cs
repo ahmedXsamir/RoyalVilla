@@ -52,6 +52,7 @@ app.MapControllers();
 
 app.Run();
 
+// Apply pending migrations and seed data
 static async Task SeedDataAsync(WebApplication app)
 {
     using var scope = app.Services.CreateScope();
