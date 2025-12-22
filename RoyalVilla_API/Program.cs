@@ -18,6 +18,8 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+await SeedDataAsync(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -49,3 +51,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task SeedDataAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
