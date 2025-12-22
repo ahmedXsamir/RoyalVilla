@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RoyalVilla_API.Models;
 
 namespace RoyalVilla_API.Data
 {
@@ -8,8 +9,8 @@ namespace RoyalVilla_API.Data
         {
         }
 
-        // Define your DbSets here
-
+        // Define DbSets 
+        public DbSet<Villa> Villas { get; set; }
 
         override protected void OnModelCreating(ModelBuilder modelBuilder)
         {
