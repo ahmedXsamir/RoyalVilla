@@ -46,7 +46,28 @@ namespace RoyalVilla_API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     $"An error occured while retrieving villa with ID {id} : {ex.Message}");
             }
+        }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Villa>> CreateVilla([FromBody] Villa villa)
+        {
+            try
+            {
+                if (villa == null)
+                    return NotFound("Villa data is required");
+
+                await _db.Villas.AddAsync(villa);
+                await _db.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetVillaByID), new { id = villa.Id }, villa);
+            }
+
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"An error occured while creating the villa : {ex.Message}");
+            }
         }
     }
 }
