@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RoyalVilla_API.Data;
 using RoyalVilla_API.Models;
+using RoyalVilla_API.Models.DTOs;
 
 namespace RoyalVilla_API.Controllers
 {
@@ -51,16 +52,27 @@ namespace RoyalVilla_API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Villa>> CreateVilla([FromBody] Villa villa)
+        public async Task<ActionResult<Villa>> CreateVilla([FromBody] VillaCreateDTO villaDTO)
         {
             try
             {
-                if (villa == null)
+                if (villaDTO == null)
                     return NotFound("Villa data is required");
+
+                Villa villa = new()
+                {
+                    Name = villaDTO.Name,
+                    Details = villaDTO.Details,
+                    Rate = villaDTO.Rate,
+                    Sqft = villaDTO.Sqft,
+                    Occupancy = villaDTO.Occupancy,
+                    ImageUrl = villaDTO.ImageUrl,
+                    CreatedDate = DateTime.Now
+                };
 
                 await _db.Villas.AddAsync(villa);
                 await _db.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetVillaByID), new { id = villa.Id }, villa);
+                return CreatedAtAction(nameof(GetVillaByID), new { id = villa.Id }, villaDTO);
             }
 
             catch (Exception ex)
