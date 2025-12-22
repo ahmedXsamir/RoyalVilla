@@ -3,7 +3,7 @@
 namespace RoyalVilla_API.Controllers
 {
     [ApiController]
-    [Route("api/villa")]
+    [Route("api/[controller]")]
     public class VillaController : ControllerBase
     {
     }
