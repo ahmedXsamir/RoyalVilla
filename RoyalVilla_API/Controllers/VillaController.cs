@@ -62,6 +62,10 @@ namespace RoyalVilla_API.Controllers
                 if (villaDTO == null)
                     return NotFound("Villa data is required");
 
+                var dublicatedVilla = await _db.Villas.FirstOrDefaultAsync(u => u.Name.ToLower() == villaDTO.Name.ToLower());
+                if (dublicatedVilla != null)
+                    return Conflict($"A Villa with the name '{villaDTO.Name}' already exists"); // 409 Conflict
+
                 Villa villa = _mapper.Map<Villa>(villaDTO);   
 
                 await _db.Villas.AddAsync(villa);
@@ -99,7 +103,7 @@ namespace RoyalVilla_API.Controllers
                     .FirstOrDefaultAsync(u => u.Name.ToLower() == villaDTO.Name.ToLower() && u.Id != id);
 
                 if (dublicatedVilla != null)
-                    return Conflict($"A Villa with the name '{villaDTO.Name}' already exists");
+                    return Conflict($"A Villa with the name '{villaDTO.Name}' already exists"); // 409 Conflict
 
                 _mapper.Map(villaDTO, exisitingVilla);
                 exisitingVilla.UpdatedDate = DateTime.Now;
