@@ -21,28 +21,46 @@ namespace RoyalVilla_API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Villa>>> GetVillas()
+        public async Task<ActionResult<IEnumerable<VillaDTO>>> GetVillas()
         {
-            List<Villa> Villas = await _db.Villas.ToListAsync();
-            return Ok(Villas);
+            var Villas = await _db.Villas.ToListAsync();
+            return Ok(_mapper.Map<List<VillaDTO>>(Villas));
         }
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Villa>> GetVillaByID(int id)
+        public async Task<ActionResult<APIResponse<VillaDTO>>> GetVillaByID(int id)
         {
             try
             {
                 if (id <= 0)
-                    return NotFound("Villa ID must be greater than 0");
+                    return new APIResponse<VillaDTO>()
+                    {
+                        Success = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Errors = "Villa ID must be greater than 0",
+                        Message = "Bad Request"
+                    };
 
                 var villa = await _db.Villas.FirstOrDefaultAsync(v => v.Id == id);
 
                 if (villa == null)
-                    return NotFound($"Villa with ID {id} was not found");
+                    return new APIResponse<VillaDTO>()
+                    {
+                        Success = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Errors = $"Villa with ID {id} was not found",
+                        Message = "NotFound"
+                    };
 
-                return Ok(villa);
+                return new APIResponse<VillaDTO>()
+                {
+                    Success = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = _mapper.Map<VillaDTO>(villa),
+                    Message = "Record retrieved successfully"
+                };
             }
 
             catch (Exception ex)
@@ -55,7 +73,7 @@ namespace RoyalVilla_API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Villa>> CreateVilla([FromBody] VillaCreateDTO villaDTO)
+        public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody] VillaCreateDTO villaDTO)
         {
             try
             {
@@ -70,7 +88,7 @@ namespace RoyalVilla_API.Controllers
 
                 await _db.Villas.AddAsync(villa);
                 await _db.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetVillaByID), new { id = villa.Id }, villaDTO);
+                return CreatedAtAction(nameof(GetVillaByID), new { id = villa.Id }, _mapper.Map<VillaDTO>(villa));
             }
 
             catch (Exception ex)
@@ -85,7 +103,7 @@ namespace RoyalVilla_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Villa>> UpdateVilla([FromBody] VillaUpdateDTO villaDTO, int id)
+        public async Task<ActionResult<VillaUpdateDTO>> UpdateVilla([FromBody] VillaUpdateDTO villaDTO, int id)
         {
             try
             {
