@@ -75,5 +75,67 @@ namespace RoyalVilla_API.Controllers
                     $"An error occured while creating the villa : {ex.Message}");
             }
         }
+
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Villa>> UpdateVilla([FromBody] VillaUpdateDTO villaDTO, int id)
+        {
+            try
+            {
+                if (villaDTO == null)
+                    return BadRequest("Invalid villa data");
+                if (id != villaDTO.Id)
+                    return BadRequest("Villa ID in URL doesn't match the Vill ID in request body");
+
+                var exisitingVilla = await _db.Villas.AsNoTracking().FirstOrDefaultAsync(v => v.Id == id);
+
+                if (exisitingVilla == null)
+                    return NotFound($"Villa with ID {id} was not found");
+
+                _mapper.Map(villaDTO, exisitingVilla);
+                exisitingVilla.UpdatedDate = DateTime.Now;
+
+                _db.Villas.Update(exisitingVilla);
+                await _db.SaveChangesAsync();
+                return Ok(villaDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"An error occured while updating the villa with ID {id} : {ex.Message}");
+            }
+
+        }
+
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Villa>> DeleteVilla(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    return BadRequest("Villa ID must be greater than 0");
+
+                var villa = await _db.Villas.FirstOrDefaultAsync(v => v.Id == id);
+
+                if (villa == null)
+                    return NotFound($"Villa with ID {id} was not found");
+
+                _db.Villas.Remove(villa);
+                await _db.SaveChangesAsync();
+                return Ok(villa);
+            }
+
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"An error occured while deleting the villa with ID {id} : {ex.Message}");
+            }
+        }
     }
 }
