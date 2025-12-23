@@ -37,7 +37,7 @@
         public static APIResponse<TData> NotFound(object errors, string message = "Resource not found")
             => Create(false, 404, message);
 
-        public static APIResponse<TData> Confilct(string message = "Conflict occurred")
+        public static APIResponse<TData> Conflict(string message = "Conflict occurred")
             => Create(false, 409, message);
         
         public static APIResponse<TData> Error(int statusCode, string message, object? errors = null)
