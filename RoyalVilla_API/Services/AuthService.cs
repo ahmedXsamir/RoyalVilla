@@ -86,7 +86,7 @@ namespace RoyalVilla_API.Services
         private string GenerateJwtToken(User user)
         {
             // Create security key using the secret key from configuration
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is not configured.")));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"] ?? throw new InvalidOperationException("JWT Secret Key is not configured.")));
 
             // Create signing credentials using the security key and HMAC SHA256 algorithm
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
