@@ -18,7 +18,7 @@ namespace RoyalVilla_API.Services
         public async Task<bool> IsEmailExistsAsync(string email)
         {
             // Check if any user exists with the given email (case-insensitive)
-            return await _db.Users.AnyAsync(u => u.Email.Equals(email, StringComparison.CurrentCultureIgnoreCase));
+            return await _db.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
         }
 
         public async Task<UserDTO?> RegisterAsync(RegisterationRequestDTO registerationRequestDTO)
