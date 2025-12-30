@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using RoyalVilla_API.Data;
 using RoyalVilla_API.Models;
 using RoyalVilla_API.Models.DTOs;
+using RoyalVilla_API.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
 builder.Services.AddAutoMapper(options =>
 {
     options.CreateMap<Villa, VillaCreateDTO>().ReverseMap();
@@ -25,6 +27,9 @@ builder.Services.AddAutoMapper(options =>
     options.CreateMap<VillaDTO, VillaUpdateDTO>().ReverseMap();
     options.CreateMap<User, UserDTO>().ReverseMap();
 });
+
+// Register AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
