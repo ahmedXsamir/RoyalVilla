@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RoyalVilla_API.Data;
 using RoyalVilla_API.Models;
 using RoyalVilla_API.Models.DTOs;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace RoyalVilla_API.Services
 {
@@ -10,10 +14,12 @@ namespace RoyalVilla_API.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;   
+        private readonly IConfiguration _configuration;
         public AuthService(ApplicationDbContext db, IMapper mapper, IConfiguration configuration)
         {
             _db = db;
             _mapper = mapper;
+            _configuration = configuration;
         }
         public async Task<bool> IsEmailExistsAsync(string email)
         {
@@ -61,10 +67,12 @@ namespace RoyalVilla_API.Services
                 if (user == null || user.Password != loginRequestDTO.Password)
                     throw new UnauthorizedAccessException("Invalid email or password.");
 
+                var token = GenerateJwtToken(user);
+
                 return new LoginResponseDTO
                 {
                     UserDTO = _mapper.Map<UserDTO>(user),
-                    Token = ""
+                    Token = token
                 };
             }
 
@@ -73,6 +81,39 @@ namespace RoyalVilla_API.Services
 
                 throw new InvalidOperationException("An unexpected error occurred during user login", ex);
             }
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            // Create security key using the secret key from configuration
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is not configured.")));
+
+            // Create signing credentials using the security key and HMAC SHA256 algorithm
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // Create token descriptor
+            // it contains the claims, expiration time, and signing credentials for the token
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                // Define the claims for the token
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.Role)
+                }),
+
+                // Set token expiration time to 7 days from now
+                Expires = DateTime.UtcNow.AddDays(7),
+
+                // Set the signing credentials
+                SigningCredentials = credentials
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
     }
