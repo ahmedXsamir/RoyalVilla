@@ -111,8 +111,13 @@ namespace RoyalVilla_API.Services
                 SigningCredentials = credentials
             };
 
+            // Create the token using JwtSecurityTokenHandler
             var tokenHandler = new JwtSecurityTokenHandler();
+
+            // Create the token based on the token descriptor
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // Return the serialized token as a string
             return tokenHandler.WriteToken(token);
         }
 

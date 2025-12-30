@@ -12,10 +12,10 @@ namespace RoyalVilla_API.Controllers
         private readonly IAuthService _authService = authService;
 
         [HttpPost("register")]
-        [ProducesResponseType(typeof(APIResponse<UserDTO>), 201)]
-        [ProducesResponseType(typeof(APIResponse<object>), 400)]
-        [ProducesResponseType(typeof(APIResponse<object>), 409)]
-        [ProducesResponseType(typeof(APIResponse<object>), 500)]
+        [ProducesResponseType(typeof(APIResponse<UserDTO>),StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(APIResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(APIResponse<object>), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(APIResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse<UserDTO>>> Register(RegisterationRequestDTO registerationRequestDTO)
         {
             try
@@ -39,6 +39,33 @@ namespace RoyalVilla_API.Controllers
             catch (Exception ex)
             {
                 var errorReponse = APIResponse<object>.Error(500, "An error occured while registration", ex.Message);
+                return StatusCode(500, errorReponse);
+            }
+        }
+
+        [HttpPost("login")]
+        [ProducesResponseType(typeof(APIResponse<LoginResponseDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(APIResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(APIResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<APIResponse<LoginResponseDTO>>> Login(LoginRequestDTO loginRequestDTO)
+        {
+            try
+            {
+                if (loginRequestDTO == null)
+                    return BadRequest(APIResponse<object>.BadRequest("Login data is required"));
+
+                var loginResponse = await _authService.LoginAsync(loginRequestDTO);
+
+                if (loginResponse == null)
+                    return BadRequest(APIResponse<object>.BadRequest("Invalid email or password"));
+
+                var response = APIResponse<LoginResponseDTO>.Ok(loginResponse, "Login successful");
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var errorReponse = APIResponse<object>.Error(500, "An error occured while login", ex.Message);
                 return StatusCode(500, errorReponse);
             }
         }
