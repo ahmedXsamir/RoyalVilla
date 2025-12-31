@@ -79,6 +79,10 @@ builder.Services.AddAutoMapper(options =>
     options.CreateMap<Villa, VillaDTO>().ReverseMap();
     options.CreateMap<VillaDTO, VillaUpdateDTO>().ReverseMap();
     options.CreateMap<User, UserDTO>().ReverseMap();
+    options.CreateMap<VillaAmenities, VillaAmenitiesCreateDTO>().ReverseMap();
+    options.CreateMap<VillaAmenities, VillaAmenitiesUpdateDTO>().ReverseMap();
+    options.CreateMap<VillaAmenities, VillaAmenitiesDTO>().ForMember(destinationMember => destinationMember.VillaName,
+        opt => opt.MapFrom(sourceMember => sourceMember.Villa != null ? sourceMember.Villa.Name : string.Empty)).ReverseMap();
 });
 
 // Register AuthService
