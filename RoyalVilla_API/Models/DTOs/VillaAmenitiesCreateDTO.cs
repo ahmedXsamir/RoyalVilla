@@ -11,6 +11,6 @@ namespace RoyalVilla_API.Models.DTOs
         public string? Description { get; set; }
 
         [Required]
-        public int VillId { get; set; }
+        public int VillaId { get; set; }
     }
 }
