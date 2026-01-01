@@ -1,4 +1,4 @@
-﻿namespace RoyalVilla_API.Models.DTOs
+﻿namespace RoyalVilla.DTO
 {
     public class LoginResponseDTO
     {

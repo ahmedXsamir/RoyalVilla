@@ -1,4 +1,4 @@
-﻿namespace RoyalVilla_API.Controllers
+﻿namespace RoyalVilla.DTO
 {
     public class APIResponse<TData>
     {
