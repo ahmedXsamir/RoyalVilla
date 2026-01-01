@@ -21,9 +21,39 @@ namespace RoyalVillaWeb.Services
             ResponseModel = new APIResponse<object>();
         }
 
-        public Task<T> SendAsync<T>(APIRequest apiRequest)
+        public async Task<T?> SendAsync<T>(APIRequest apiRequest)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var client = _httpClient.CreateClient("RoyalVillaAPI");
+                HttpRequestMessage message = new HttpRequestMessage()
+                {
+                    RequestUri = new Uri(apiRequest.Url!),
+                    Method = apiRequest.ApiType switch
+                    {
+                        SD.APIType.POST => HttpMethod.Post,
+                        SD.APIType.PUT => HttpMethod.Put,
+                        SD.APIType.DELETE => HttpMethod.Delete,
+                        _ => HttpMethod.Get
+                    }
+                };
+                
+                if (apiRequest.Data != null)
+                {
+                    // Serialize the data to JSON and add it to the request body
+                    message.Content = JsonContent.Create(apiRequest.Data, options: jsonSerializerOptions);  
+                }
+
+                var apiResponse = await client.SendAsync(message);
+                return await apiResponse.Content.ReadFromJsonAsync<T>(jsonSerializerOptions);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected Error: {ex.Message}");
+                return default;
+            }
         }
+
     }
 }
