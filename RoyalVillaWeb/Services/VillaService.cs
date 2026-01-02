@@ -1,4 +1,5 @@
 ﻿using RoyalVilla.DTO;
+using RoyalVillaWeb.Models;
 using RoyalVillaWeb.Services.IServices;
 
 namespace RoyalVillaWeb.Services
@@ -6,34 +7,64 @@ namespace RoyalVillaWeb.Services
     public class VillaService : BaseService, IVillaService
     {
         private new readonly IHttpClientFactory _httpClient;
-        public VillaService(IHttpClientFactory httpClient) : base(httpClient)
+        private readonly string _villaUrl;
+        private const string APIEndpoint = "/api/villa";
+        public VillaService(IHttpClientFactory httpClient, IConfiguration configuration) : base(httpClient)
         {
             _httpClient = httpClient;
+            _villaUrl = configuration.GetValue<string>("ServiceUrls:VillaAPI");
         }
 
-        public Task<T?> CreateAsync<T>(VillaCreateDTO dto)
+        public Task<T?> CreateAsync<T>(VillaCreateDTO dto, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.APIType.POST,  
+                Data = dto,
+                Url = $"{_villaUrl}{APIEndpoint}",
+                Token = token
+            });
         }
 
-        public Task<T?> DeleteAsync<T>(int id)
+        public Task<T?> DeleteAsync<T>(int id, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.APIType.DELETE,
+                Url = $"{_villaUrl}{APIEndpoint}/{id}",
+                Token = token
+            });
         }
 
-        public Task<T?> GetAllAsync<T>()
+        public Task<T?> GetAllAsync<T>(string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.APIType.GET,
+                Url = $"{_villaUrl}{APIEndpoint}",
+                Token = token
+            });
         }
 
-        public Task<T?> GetAsync<T>(int id)
+        public Task<T?> GetAsync<T>(int id, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.APIType.GET,
+                Url = $"{_villaUrl}{APIEndpoint}/{id}",
+                Token = token
+            });
         }
 
-        public Task<T?> UpdateAsync<T>(VillaUpdateDTO dto)
+        public Task<T?> UpdateAsync<T>(VillaUpdateDTO dto, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.APIType.PUT,
+                Data = dto,
+                Url = $"{_villaUrl}{APIEndpoint}{dto.Id}",
+                Token = token
+            });
         }
     }
 }
