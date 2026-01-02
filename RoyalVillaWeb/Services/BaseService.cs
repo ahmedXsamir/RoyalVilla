@@ -28,7 +28,7 @@ namespace RoyalVillaWeb.Services
                 var client = _httpClient.CreateClient("RoyalVillaAPI");
                 HttpRequestMessage message = new HttpRequestMessage()
                 {
-                    RequestUri = new Uri(apiRequest.Url!),
+                    RequestUri = new Uri(apiRequest.Url,UriKind.Relative),
                     Method = apiRequest.ApiType switch
                     {
                         SD.APIType.POST => HttpMethod.Post,
