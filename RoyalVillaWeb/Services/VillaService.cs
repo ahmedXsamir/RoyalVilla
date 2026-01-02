@@ -6,11 +6,9 @@ namespace RoyalVillaWeb.Services
 {
     public class VillaService : BaseService, IVillaService
     {
-        private readonly string _villaUrl;
         private const string APIEndpoint = "/api/villa";
         public VillaService(IHttpClientFactory httpClient, IConfiguration configuration) : base(httpClient)
         {
-            _villaUrl = configuration.GetValue<string>("ServiceUrls:VillaAPI");
         }
 
         public Task<T?> CreateAsync<T>(VillaCreateDTO dto, string token)
@@ -19,7 +17,7 @@ namespace RoyalVillaWeb.Services
             {
                 ApiType = SD.APIType.POST,  
                 Data = dto,
-                Url = $"{_villaUrl}{APIEndpoint}",
+                Url = $"{APIEndpoint}",
                 Token = token
             });
         }
@@ -29,7 +27,7 @@ namespace RoyalVillaWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.APIType.DELETE,
-                Url = $"{_villaUrl}{APIEndpoint}/{id}",
+                Url = $"{APIEndpoint}/{id}",
                 Token = token
             });
         }
@@ -39,7 +37,7 @@ namespace RoyalVillaWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.APIType.GET,
-                Url = $"{_villaUrl}{APIEndpoint}",
+                Url = $"{APIEndpoint}",
                 Token = token
             });
         }
@@ -49,7 +47,7 @@ namespace RoyalVillaWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.APIType.GET,
-                Url = $"{_villaUrl}{APIEndpoint}/{id}",
+                Url = $"{APIEndpoint}/{id}",
                 Token = token
             });
         }
@@ -60,7 +58,7 @@ namespace RoyalVillaWeb.Services
             {
                 ApiType = SD.APIType.PUT,
                 Data = dto,
-                Url = $"{_villaUrl}{APIEndpoint}{dto.Id}",
+                Url = $"{APIEndpoint}{dto.Id}",
                 Token = token
             });
         }
